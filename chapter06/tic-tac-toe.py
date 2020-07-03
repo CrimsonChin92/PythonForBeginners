@@ -1,5 +1,7 @@
-# Tic-Tac-Toe
+# Tic-Tac-Toe 2.0
 # Plays the game of tic-tac-toe against a human opponent
+
+# v 2.0 includes the addition of a step input into the ask_number function
    
 # global constants
 X = "X"
@@ -38,10 +40,10 @@ def ask_yes_no(question):
     return response
 
 
-def ask_number(question, low, high):
+def ask_number(question, low, high step = 1): # added input for step and set default to 1
     """Ask for a number within a range."""
     response = None
-    while response not in range(low, high):
+    while response not in range(low, high step): # added step input which can be varied with function call
         response = int(input(question))
     return response
 
