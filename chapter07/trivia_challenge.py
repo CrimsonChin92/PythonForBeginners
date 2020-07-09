@@ -1,10 +1,13 @@
-# Trivia Challenge 2.0
+# Trivia Challenge 3.0
 # Trivia game that reads a plain text file
 
 # v 2.0 - open_file() function updated to reference a new trvia file that
 #         includes points for each question
 #         next_block() function now includes return value for points
 #         main() function uses the points value to update the score
+#
+# v 3.0 - added high_scores() function to check whether user has one of top 5
+#         scores, if so include in the list
 
 import sys
 
@@ -47,6 +50,43 @@ def next_block(the_file):
 
     return category, question, answers, correct, points, explanation
 
+def high_scores(score):
+    """Checks user's high score against the current top 5. Adding deails if it is high enough"""
+    import pickle
+    # load high scores file and extract the scores list
+    scores_file=open("High_Scores.dat","rb")
+    scorelist=pickle.load(scores_file)
+    scores_file.close()
+
+    # loop through current scores and see if user score is higher
+    # ensure scores are sorted
+    scorelist.sort(reverse=False)
+    for scores in scorelist:
+        if score >= scores[1]:
+            highscore=True
+            idx = scorelist.index(scores)
+            name = input("Congratulations! You got a high score\n"+\
+                         "Please enter your name: ").upper()
+            scorelist.insert(idx,[name,score])
+            break
+        else:
+            highscore=False
+
+    if highscore:
+        # ensure only top 5 are kept and resort to check alphabetical order
+        scorelist.sort(reverse=False)
+        scorelist = scorelist[:5]
+        scores_file=open("High_Scores.dat","wb")
+        pickle.dump(scorelist, scores_file)
+        scores_file.close()
+
+    else:
+        print("Sorry you didn't make the high score list")
+
+    print("\n\nCurrent high scores:")
+    for score in scorelist:
+        print("\t",score)
+
 def welcome(title):
     """Welcome the player and get his/her name."""
     print("\t\tWelcome to Trivia Challenge!\n")
@@ -85,7 +125,10 @@ def main():
     trivia_file.close()
 
     print("That was the last question!")
-    print("You're final score is", score)
+    print("Your final score is", score)
+
+    # check high scores
+    high_scores(score)
  
 main()  
 input("\n\nPress the enter key to exit.")
