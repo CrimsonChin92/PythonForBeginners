@@ -1,5 +1,10 @@
-# Trivia Challenge
+# Trivia Challenge 2.0
 # Trivia game that reads a plain text file
+
+# v 2.0 - open_file() function updated to reference a new trvia file that
+#         includes points for each question
+#         next_block() function now includes return value for points
+#         main() function uses the points value to update the score
 
 import sys
 
@@ -33,10 +38,14 @@ def next_block(the_file):
     correct = next_line(the_file)
     if correct:
         correct = correct[0]
+
+    points = next_line(the_file)
+    if points:
+        points=int(points)      
         
     explanation = next_line(the_file) 
 
-    return category, question, answers, correct, explanation
+    return category, question, answers, correct, points, explanation
 
 def welcome(title):
     """Welcome the player and get his/her name."""
@@ -44,13 +53,13 @@ def welcome(title):
     print("\t\t", title, "\n")
  
 def main():
-    trivia_file = open_file("trivia.txt", "r")
+    trivia_file = open_file("trivia_points.txt", "r")
     title = next_line(trivia_file)
     welcome(title)
     score = 0
 
     # get first block
-    category, question, answers, correct, explanation = next_block(trivia_file)
+    category, question, answers, correct, points, explanation = next_block(trivia_file)
     while category:
         # ask a question
         print(category)
@@ -64,14 +73,14 @@ def main():
         # check answer
         if answer == correct:
             print("\nRight!", end=" ")
-            score += 1
+            score += points
         else:
             print("\nWrong.", end=" ")
         print(explanation)
         print("Score:", score, "\n\n")
 
         # get next block
-        category, question, answers, correct, explanation = next_block(trivia_file)
+        category, question, answers, correct, points, explanation = next_block(trivia_file)
 
     trivia_file.close()
 
