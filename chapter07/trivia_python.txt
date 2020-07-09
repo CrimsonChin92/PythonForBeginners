@@ -1,0 +1,28 @@
+A Slippery Episode
+It's all sequencial
+Which of the following is an example of a sequence?
+A list
+A tuple
+A string
+All of the above
+4
+10
+They are all sequences.
+I'll Give Him an Offer He Can't Refuse
+How much does Python software cost?
+It's free open source software
+You can trial for free, but with only limited functionality
+There is a one off fee of $30
+Python is a subscription service, $5 / month
+1
+10
+It is completely free!!!!!!!
+An Error in Judgement
+Which of these would cause an error?
+print("Judge"+"ment")
+print("Judgement')
+print("J","u","d","g","e","m","e","n","t")
+print(("Judgement").upper())
+2
+10
+You need to judge your use of single quotes and double quotes correctly

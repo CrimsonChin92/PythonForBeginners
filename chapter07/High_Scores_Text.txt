@@ -1,0 +1,10 @@
+AAA
+70
+BBB
+60
+CCC
+50
+DDD
+40
+EEE
+30
