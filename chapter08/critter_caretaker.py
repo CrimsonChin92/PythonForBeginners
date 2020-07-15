@@ -1,10 +1,12 @@
-# Critter Caretaker 2.0
+# Critter Caretaker 3.0
 # A virtual pet to care for
 
 # v2.0 - Allow user to specify amount of food and how long to play for. These affect the rate at which hunger and
 #        boredom levels drop. A new function called boundary() has been added which repeats a quantity call,
 #        when input is out of a given range. Print  outs in the class methods confirm user inputs and a prompt
 #        if they reach saturation points.
+# v3.0 - Add "back door" that shows the value of attributes when a secret selection is made.
+#        this invoked the method __str__()
 
 class Critter(object):
     """A virtual pet"""
@@ -12,6 +14,13 @@ class Critter(object):
         self.name = name
         self.hunger = hunger
         self.boredom = boredom
+
+    def __str__(self):
+        status = ("Critter status:\n")
+        status += "Name:\t\t" + self.name + "\n"
+        status += "Hunger:\t\t" + str(self.hunger) + "\n"
+        status += "Boredom:\t" + str(self.boredom) + "\n"
+        return status
 
     def __pass_time(self):
         self.hunger += 1
@@ -112,6 +121,10 @@ def main():
             if play_time%10 >= 5: # round up
                 fun += 1
             crit.play(fun = fun)
+
+        # check status with secret combination
+        elif choice == "0123":
+            print(crit)
 
         # some unknown choice
         else:
