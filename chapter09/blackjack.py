@@ -1,5 +1,9 @@
-# Blackjack
+# Blackjack 2.0
 # From 1 to 7 players compete against a dealer
+
+# v2.0 - Added check to ensure sufficient cards remin in the deck to complete
+#        another round of blackjack. If there are insufficient cards then
+#        reshuffle deck. Also add check for duplicate names.
 
 import cards, games     
 
@@ -23,6 +27,12 @@ class BJ_Deck(cards.Deck):
         for suit in BJ_Card.SUITS: 
             for rank in BJ_Card.RANKS: 
                 self.cards.append(BJ_Card(rank, suit))
+
+    @property
+    def cards_remaining(self):
+        tot = len(self.cards)
+        return tot
+
     
 
 class BJ_Hand(cards.Hand):
@@ -176,7 +186,9 @@ def main():
     names = []
     number = games.ask_number("How many players? (1 - 7): ", low = 1, high = 8)
     for i in range(number):
-        name = input("Enter player name: ")
+        name = input("Enter player name: ").title()
+        while name in names:
+            name = input("Player '" + name + "' already exists. Try a different name: ").title()
         names.append(name)
     print()
         
@@ -184,6 +196,12 @@ def main():
 
     again = None
     while again != "n":
+        if game.deck.cards_remaining < number*5:
+            # if low on cards reset deck
+            input("\nLow on cards. Press enter to reset deck\n")
+            game.deck.populate()
+            game.deck.shuffle()   
+        
         game.play()
         again = games.ask_yes_no("\nDo you want to play again?: ")
 
