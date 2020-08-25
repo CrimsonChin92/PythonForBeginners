@@ -1,5 +1,12 @@
-# Blackjack
+# Blackjack 3.0
 # From 1 to 7 players compete against a dealer
+
+# v2.0 - Added check to ensure sufficient cards remin in the deck to complete
+#        another round of blackjack. If there are insufficient cards then
+#        reshuffle deck. Also add check for duplicate names.
+
+# v3.0 - Add capability for players to bet. Any players with zero money will be
+#        removed from the game
 
 import cards, games     
 
@@ -23,6 +30,12 @@ class BJ_Deck(cards.Deck):
         for suit in BJ_Card.SUITS: 
             for rank in BJ_Card.RANKS: 
                 self.cards.append(BJ_Card(rank, suit))
+
+    @property
+    def cards_remaining(self):
+        tot = len(self.cards)
+        return tot
+
     
 
 class BJ_Hand(cards.Hand):
@@ -68,6 +81,11 @@ class BJ_Hand(cards.Hand):
 
 class BJ_Player(BJ_Hand):
     """ A Blackjack Player. """
+    # Update init to include a bankroll
+    def __init__(self, name, bank = 500):
+        super(BJ_Player, self).__init__(name)
+        self.bank = bank
+        
     def is_hitting(self):
         response = games.ask_yes_no("\n" + self.name + ", do you want a hit? (Y/N): ")
         return response == "y"
@@ -79,11 +97,22 @@ class BJ_Player(BJ_Hand):
     def lose(self):
         print(self.name, "loses.")
 
-    def win(self):
+    def win(self, pot, num_winners):
         print(self.name, "wins.")
+        # add winnings to the players pot
+        self.bank += pot//num_winners
 
     def push(self):
         print(self.name, "pushes.")
+
+    # add betting capability
+    def bet(self):
+        print("you currently have £" + str(self.bank), "in your bank.", end = " ")
+        # use ask_number function in games module to request bet
+        bid = games.ask_number("How much would you like to bet on your hand?", 0, self.bank+1)
+        # remove bet from players bank
+        self.bank -= bid
+        return bid
 
         
 class BJ_Dealer(BJ_Hand):
@@ -129,12 +158,28 @@ class BJ_Game(object):
                 player.bust()
            
     def play(self):
+        # initialise pot at £0
+        pot = 0
+
+        # check if any players have gone bust and remove from game
+        for player in self.players:
+            if player.bank == 0:
+                print("\n" + player.name, "has run out of money and been removed from the table.\n\n")
+                self.players.remove(player)
+                
+        
         # deal initial 2 cards to everyone
         self.deck.deal(self.players + [self.dealer], per_hand = 2)
         self.dealer.flip_first_card()    # hide dealer's first card
         for player in self.players:
             print(player)
         print(self.dealer)
+
+        # get bid from all players and add to pot
+        for player in self.players:
+            print(player.name, end=" ")
+            bid = player.bet()
+            pot += bid
 
         # deal additional cards to players
         for player in self.players:
@@ -156,9 +201,10 @@ class BJ_Game(object):
                     player.win()                    
             else:
                 # compare each player still playing to dealer
+                winners = len(self.still_playing)
                 for player in self.still_playing:
                     if player.total > self.dealer.total:
-                        player.win()
+                        player.win(pot, winners)
                     elif player.total < self.dealer.total:
                         player.lose()
                     else:
@@ -176,7 +222,9 @@ def main():
     names = []
     number = games.ask_number("How many players? (1 - 7): ", low = 1, high = 8)
     for i in range(number):
-        name = input("Enter player name: ")
+        name = input("Enter player name: ").title()
+        while name in names:
+            name = input("Player '" + name + "' already exists. Try a different name: ").title()
         names.append(name)
     print()
         
@@ -184,10 +232,21 @@ def main():
 
     again = None
     while again != "n":
+        if game.deck.cards_remaining < number*5:
+            # if low on cards reset deck
+            input("\nLow on cards. Press enter to reset deck\n")
+            game.deck.populate()
+            game.deck.shuffle()   
+        
         game.play()
         again = games.ask_yes_no("\nDo you want to play again?: ")
 
+    # present final results
+    print("\nFinal standings:")
+    for player in game.players:
+        print(player.name, "- £" +str(player.bank))
 
+    
 main()
 input("\n\nPress the enter key to exit.")
 
